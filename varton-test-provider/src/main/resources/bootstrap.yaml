@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: varton-test-provider
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        server-addr: ${NACOS_SERVER:mse-3d7f3650-p.nacos-ans.mse.aliyuncs.com:8848}
+      discovery:
+        server-addr: ${NACOS_SERVER:mse-3d7f3650-p.nacos-ans.mse.aliyuncs.com:8848}
+  config:
+    use-legacy-processing: true
+dubbo:
+  registry:
+    address: nacos://${NACOS_SERVER:mse-3d7f3650-p.nacos-ans.mse.aliyuncs.com:8848}
+    check: false
+    id: nacos
+  protocol:
+    id: dubbo

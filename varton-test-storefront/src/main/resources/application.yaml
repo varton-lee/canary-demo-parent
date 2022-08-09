@@ -1,0 +1,16 @@
+server:
+  port: ${random.int[2000,8000]}
+service:
+  tag: ${SERVICE_TAG:blue}
+dubbo:
+  cloud:
+    # The subscribed services in consumer side
+    subscribed-services: varton-test-provider
+  protocols:
+    dubbo:
+      port: -1
+  consumer:
+    check: false
+    tag: ${SERVICE_TAG:blue}
+  provider:
+    tag: ${SERVICE_TAG:blue}

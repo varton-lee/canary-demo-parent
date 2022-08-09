@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: varton-test-gateway
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        server-addr: ${NACOS_SERVER:mse-3d7f3650-p.nacos-ans.mse.aliyuncs.com:8848}
+      discovery:
+        server-addr: ${NACOS_SERVER:mse-3d7f3650-p.nacos-ans.mse.aliyuncs.com:8848}
+    gateway:
+      routes:
+        - id: varton-test-storefront
+          uri: lb://varton-test-storefront
+          predicates:
+            - Path=/storefront/**
+          filters:
+            - name: Authorization
+
+  config:
+    use-legacy-processing: true
+
+
+service:
+  tag: ${SERVICE_TAG:blue}
+dubbo:
+  registry:
+    address: nacos://${NACOS_SERVER:mse-3d7f3650-p.nacos-ans.mse.aliyuncs.com:8848}
+    check: false
+    id: nacos
+  consumer:
+    lazy: true
+    check: false
+  protocol:
+    id: dubbo

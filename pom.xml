@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>Churchill-Parent</artifactId>
+        <groupId>com.salesforcechina</groupId>
+        <version>0.0.59</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>canary-demo-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>varton-test-gateway</module>
+        <module>varton-test-storefront</module>
+        <module>varton-test-provider</module>
+        <module>varton-test-api</module>
+    </modules>
+
+
+    <properties>
+        <base.image.repoTag>zulu-openjdk-alpine:8u282-sfc-1</base.image.repoTag>
+        <docker.repository>registry.cn-hangzhou.aliyuncs.com</docker.repository>
+        <docker.registry.name>local_dev_env</docker.registry.name>
+        <java.version>1.8</java.version>
+        <churchill.monitor.version>0.0.7</churchill.monitor.version>
+        <churchill.logback.version>0.0.25</churchill.logback.version>
+        <churchill.monitor.version>0.0.7</churchill.monitor.version>
+        <churchill.idaas.version>0.0.31</churchill.idaas.version>
+        <churchill.kms.version>0.0.4</churchill.kms.version>
+        <churchill.redis.version>0.0.24</churchill.redis.version>
+        <churchill.polardb.version>0.0.10</churchill.polardb.version>
+        <churchill.flyway.version>7.8.2</churchill.flyway.version>
+        <jacoco.version>0.8.7</jacoco.version>
+        <jarsignature.skip>false</jarsignature.skip>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>com.salesforcechina</groupId>
+                <artifactId>platform-common</artifactId>
+                <version>0.1.70</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>1.8.0</version>
+                <configuration>
+                    <from>
+                        <image>${docker.repository}/sfdc_china_dev/${base.image.repoTag}</image>
+                    </from>
+                    <to>
+                        <image>${docker.repository}/${docker.registry.name}/${project.name}:0.0.1-0809</image>
+                    </to>
+                    <container>
+                        <jvmFlags>
+                            <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+                            <jvmFlag>-Duser.timezone=GMT+08</jvmFlag>
+                        </jvmFlags>
+                        <environment>
+                            <TZ>Asia/Shanghai</TZ>
+                        </environment>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        <!-- 这里要与 Dockerfile 中定义的用户一致 -->
+                        <user>java-app</user>
+                    </container>
+                    <allowInsecureRegistries>true</allowInsecureRegistries>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source> <!-- or higher, depending on your project -->
+                    <target>${java.version}</target> <!-- or higher, depending on your project -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${org.projectlombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <distributionManagement>
+        <repository>
+            <id>maven-release</id>
+            <name>Release</name>
+            <url>https://nexus.sfdcbt-cn.net/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven-snapshots</id>
+            <name>Snapshot</name>
+            <url>https://nexus.sfdcbt-cn.net/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+</project>

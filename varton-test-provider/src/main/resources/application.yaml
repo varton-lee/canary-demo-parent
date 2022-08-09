@@ -1,0 +1,15 @@
+server:
+  port: -1
+service:
+  tag: ${SERVICE_TAG:blue}
+dubbo:
+  scan:
+    base-packages: com.salesforcechina.varton.api.apiservice
+  protocols:
+    dubbo:
+      name: dubbo
+      port: -1
+  consumer:
+    tag: ${SERVICE_TAG:blue}
+  provider:
+    tag: ${SERVICE_TAG:blue}

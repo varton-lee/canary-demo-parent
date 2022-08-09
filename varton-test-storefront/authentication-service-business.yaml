@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+  name: authentication-service
+  namespace: business
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentication-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 20%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      containers:
+        - image: >-
+            registry-vpc.cn-hangzhou.aliyuncs.com/sfdc_china_dev/authentication-service-business:ros
+          imagePullPolicy: Always
+          env:
+            - name: NacosServerAddr
+              value: ${NacosServerAddr}
+          name: authentication-service
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 6061
+
+            initialDelaySeconds: 30
+            timeoutSeconds: 2
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              # scheme: HTTPS
+              path: /actuator/health
+              port: 6061
+            initialDelaySeconds: 30
+            timeoutSeconds: 2
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: "2"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+---
+# create pod service
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentication-service
+  namespace: business
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: authentication-service
+  type: NodePort
+---
+# create ingress, define rules
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: authentication-ingress
+  namespace: business
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /business/api/v1/auth
+            backend:
+              serviceName: authentication-service
+              servicePort: 80
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: authentication-hpa
+  namespace: business
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: authentication-service
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

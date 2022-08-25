@@ -1,0 +1,6 @@
+{{ $canaryTag := default "" (trimPrefix "-" .Values.versionTag) }}
+{{ $suffix := ternary (printf "-%s" $canaryTag) $canaryTag (ne "" $canaryTag) }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: varton{{ $suffix }}

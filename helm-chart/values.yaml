@@ -1,0 +1,7 @@
+canary: false
+versionTag: ""
+gatewayTag: 0.0.1-SNAPSHOT
+providerTag: 0.0.1-SNAPSHOT
+storefrontTag: 0.0.1-SNAPSHOT
+envTag: ".dev"
+domainName: "tab-test.com"

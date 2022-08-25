@@ -1,0 +1,34 @@
+{{ $canaryTag := default "" (trimPrefix "-" .Values.versionTag) }}
+{{ $suffix := ternary (printf "-%s" $canaryTag) $canaryTag (ne "" $canaryTag) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: varton-test-provider
+  namespace: varton{{ $suffix }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: varton-test-provider
+  template:
+    metadata:
+      {{ if .Values.canary }}annotations:
+        alicloud.service.tag: "{{ $canaryTag }}"
+        msePilotAutoEnable: "on"
+        msePilotCreateAppName: varton-test-provider{{ end }}
+      labels:
+        app: varton-test-provider
+    spec:
+      containers:
+        - env:
+            {{ if .Values.canary }}- name: SERVICE_TAG
+              value: {{ $canaryTag }}
+            - name: profiler.micro.service.tag.trace.enable
+              value: "true"{{ end }}
+            - name: spring.cloud.nacos.config.group
+              value: DEFAULT_GROUP{{ $suffix }}
+            - name: NACOS_SERVER
+              value: 127.0.0.1:8848
+          image: registry.cn-hangzhou.aliyuncs.com/local_dev_env/varton-test-provider:{{ .Values.providerTag }}
+          imagePullPolicy: Always
+          name: varton-test-provider

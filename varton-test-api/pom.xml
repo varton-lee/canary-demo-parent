@@ -15,8 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.salesforcechina</groupId>
-            <artifactId>platform-common</artifactId>
+            <!-- hutool-->
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
         </dependency>
 
         <dependency>

@@ -20,14 +20,14 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class AuthorizationGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthorizationGatewayFilterFactory.Config> {
+public class AuthorizationGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
     @DubboReference(check = false, lazy = true)
     private Test1Service test1Service;
     @Value("${service.tag}")
     private String serviceTag;
 
-    private Mono<Void> filterBusinessApi(ServerWebExchange exchange, GatewayFilterChain chain, Config config) {
+    private Mono<Void> filterBusinessApi(ServerWebExchange exchange, GatewayFilterChain chain) {
         String token = test1Service.isUserAvailable("1");
         log.info(String.format("dubbo call %s", token));
         String headerValue = String.format("gateway[%s]", serviceTag);
@@ -37,10 +37,10 @@ public class AuthorizationGatewayFilterFactory extends AbstractGatewayFilterFact
 
 
     @Override
-    public GatewayFilter apply(Config config) {
+    public GatewayFilter apply(Object config) {
         return ((exchange, chain) -> {
             String host = exchange.getRequest().getURI().getHost();
-            return filterBusinessApi(exchange, chain, config);
+            return filterBusinessApi(exchange, chain);
         });
     }
 
